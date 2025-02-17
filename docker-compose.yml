@@ -1,5 +1,14 @@
-version: "3"
+
 services:
+  plugins-builder:
+    build:
+      context: plugins-build 
+      dockerfile: Dockerfile
+      args:
+        REPO_URL: "https://github.com/dicoogle/dicoogle-plugins.git"
+    volumes:
+      - ./plugins:/output
+
   dicoogle:
     build:
       context: ../dicoogle
@@ -10,7 +19,7 @@ services:
     environment:
       JVM_XARGS: "-XX:+UseG1GC -Xmx2G -Xms2G -Ddicoogle.taskManager.nThreads=4"
     ports:
-      - 8080:8080
+      - 8082:8080
       - 1045:1045
       - 6666:6666
     healthcheck:
@@ -19,12 +28,11 @@ services:
       timeout: 10s
       retries: 3
     volumes:
-      - ./index:/dicoogle/index
+      - ./index:/root/index
       - ./storage:/opt/pacs
-      - ./conf:/dicoogle/conf
-      - ./logs:/dicoogle/logs
-      - ./plugins:/dicoogle/Plugins
-      - ./plugin-settings:/dicoogle/Plugins/settings
+      - ./conf:/root/conf
+      - ./logs:/root/logs
+      - ./plugins:/root/Plugins
 networks:
   default:
     driver: bridge
