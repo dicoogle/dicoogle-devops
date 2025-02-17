@@ -1,0 +1,30 @@
+version: "3"
+services:
+  dicoogle:
+    build:
+      context: ../dicoogle
+      dockerfile: Dockerfile
+    image: dicoogle/dicoogle-core:3.1.0
+    container_name: dicoogle
+    restart: unless-stopped
+    environment:
+      JVM_XARGS: "-XX:+UseG1GC -Xmx2G -Xms2G -Ddicoogle.taskManager.nThreads=4"
+    ports:
+      - 8080:8080
+      - 1045:1045
+      - 6666:6666
+    healthcheck:
+      test: "curl -f http://localhost:8080/management/dicom/storage || exit 1"
+      interval: 15s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - ./index:/dicoogle/index
+      - ./storage:/opt/pacs
+      - ./conf:/dicoogle/conf
+      - ./logs:/dicoogle/logs
+      - ./plugins:/dicoogle/Plugins
+      - ./plugin-settings:/dicoogle/Plugins/settings
+networks:
+  default:
+    driver: bridge
